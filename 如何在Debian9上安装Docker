@@ -1,0 +1,110 @@
+			如何在Debian9上安装Docker
+
+译自：https://www.itzgeek.com/how-tos/linux/debian/how-to-install-docker-on-debian-9.html
+
+	Docker是一个自由开源的容器软件，辅助应用程序在Docker容器中部署和运行。Docker容器和虚拟机十分相似，易于
+管理并且能够在所有的环境中运行（不论是什么操作系统环境）。
+	Docker容器在单个Linux实例中运行时，通过cgroups和namespace来完成容器间的隔离。
+	这篇教你如何在Debian9上安装Docker（在Debian8上也是可行的）。
+	注意：Docker需要64位版本的Debian操作系统，并且内核必须在3.10以上。
+
+1. Docker的版本
+	Docker目前共有两个版本，即：
+	× 社区版本（CE）
+	× 企业级版本（EE）
+	在这里我们将从Docker仓库中安装社区版本。
+2. 安装需求
+	先卸载名字叫做docker或者是docker-engine的老版本的dock，同时还要卸载相关联的依赖。如果你的系统没安装过
+docker，请忽略下面的步骤
+	sudo apt-get -y remove docker docker-engine docker.io
+	在/var/lib/docker/目录下的volumes、images和network是可以保留的。
+3.设置Docker仓库
+3.1 安装下面的包，使apt能够支持https
+	sudo apt-get update
+	sudo apt-get install -y apt-transport-https ca-certificates wget software-properties-common
+3.2 Docker仓库需要GPG key，将它安装到你的系统中吧
+	wget https://download.docker.com/linux/debian/gpg 
+	sudo apt-key add gpg
+3.3 通过下面的命令，将Docker官方仓库加入到系统中
+	echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee -a /etc/apt/sources.list.d/docker.list
+	然后，更新apt仓库
+	sudo apt-get update
+3.4 为了确保你安装的docker是来自官方仓库，而不是默认的Debian仓库，使用如下命令：
+	sudo apt-cache policy docker-ce
+如果输出的内容和如下一致（差不多），那么就对了。
+docker-ce:
+  Installed: (none)
+  Candidate: 17.06.0~ce-0~debian
+  Version table:
+     17.06.0~ce-0~debian 500
+        500 https://download.docker.com/linux/debian stretch/stable amd64 Packages
+     17.03.2~ce-0~debian-stretch 500
+        500 https://download.docker.com/linux/debian stretch/stable amd64 Packages
+     17.03.1~ce-0~debian-stretch 500
+        500 https://download.docker.com/linux/debian stretch/stable amd64 Packages
+     17.03.0~ce-0~debian-stretch 500
+        500 https://download.docker.com/linux/debian stretch/stable amd64 Packages
+4. 安装Docker
+	使用apt-get安装docker
+	sudo apt-get -y install docker-ce
+5. Docker服务管理
+	启动Docker
+	sudo systemctl start docker
+	关闭Docker
+	udo systemctl stop docker
+	重启Docker
+	sudo systemctl restart docker
+	查看Docker状态
+	sudo systemctl status docker
+	让Docker在系统启动时启动服务
+	sudo systemctl enable docker
+6. 校验Docker安装
+	为了校验Docker的安装，我们将运行Hello-World容器
+	sudo docker run hello-world
+	如果安装无误，你将得到如下输出：
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+b04784fba78d: Pull complete 
+Digest: sha256:f3b3b28a45160805bb16542c9531888519430e9e6d6ffc09d72261b0d26ff74f
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+7. 允许非root用户运行Docker
+	在默认的情况下，要运行Docker命令，用户必须有root用户的权限或者sudo的权限。有时我们可能需要非root用户来运行Docker容器，这样的话，跟着下面的步骤来，就能够让他们也可以有运行容器。
+	1. 创建docker用户组，如果没有的话。
+	sudo groupadd docker
+	2. 将用户xxx添加的用户组docker里面去
+	sudo usermod -aG docker xxx
+	然后用户xxx就可以运行如下命令了
+	docker run hello-world
+
+到此，Docker的安装配置已经完成了。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
